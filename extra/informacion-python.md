@@ -66,6 +66,6 @@ Basada en una versión más amplia (y comercial), Canopy.
 
 [^3]: [Lenguaje de propósito genral en Wikipedia](http://es.wikipedia.org/wiki/Lenguaje_de_programaci%C3%B3n_de_prop%C3%B3sito_general)
 
-[^4]: Se encuentra entre el 7º y e 8º, entre los lenguajes de programación más usados (véase por ejemplo los índices de popularidad [lang-index](http://lang-index.sourceforge.net), [langpop.com](http://langpop.com/), [tiobe.com](http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html))
+[^4]: Se encuentra entre el 7º y e 8º, entre los lenguajes de programación más usados (véase por ejemplo el índices de popularidad [tiobe.com](http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html) o buscar en internet, por ejemplo usando las palabras clave: *programming language popularity*)
 
 [^7]: [Introducción a la Computación Científica con Python](http://nbviewer.ipython.org/github/gfrubi/clases-python-cientifico/blob/master/Lecture-0-Scientific-Computing-with-Python.ipynb)
