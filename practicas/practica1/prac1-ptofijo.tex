@@ -1,0 +1,130 @@
+\documentclass[12pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{xspace}
+\usepackage[margin={2cm,1.7cm}]{geometry}
+\usepackage{../cabecera-UCA}
+\renewcommand{\baselinestretch}{1.1}
+\parskip=0.5em
+% \pagestyle{empty}
+\usepackage{amsfonts, amsmath}
+\usepackage{hyperref}
+
+% Entorno "algorithm" para pseudocódigo...
+\usepackage{listings}
+\usepackage{colordvi}
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    \lstset{ %this is the stype
+      escapechar=@,  % <-to introduce LaTeX ccommands
+      frame=tb,
+      numbers=left, 
+      numberstyle=\tiny,
+      basicstyle=\tt,
+      keywordstyle=\color{black}\bfseries,
+      keywords={definir} %add the keywords you want, or load a language as Rubens explains in his comment above.
+      xleftmargin=.04\textwidth,
+      aboveskip=12pt,
+      belowskip=5pt,
+    }
+    \lstset{
+    inputencoding = utf8,  % Input encoding
+    extendedchars = true,  % Extended ASCII
+    literate      =        % Support additional characters
+      {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
+      {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
+      {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
+      {À}{{\`A}}1  {È}{{\'E}}1  {Ì}{{\`I}}1 {Ò}{{\`O}}1  {Ù}{{\`U}}1
+      {ä}{{\"a}}1  {ë}{{\"e}}1  {ï}{{\"i}}1 {ö}{{\"o}}1  {ü}{{\"u}}1
+      {Ä}{{\"A}}1  {Ë}{{\"E}}1  {Ï}{{\"I}}1 {Ö}{{\"O}}1  {Ü}{{\"U}}1
+      {â}{{\^a}}1  {ê}{{\^e}}1  {î}{{\^i}}1 {ô}{{\^o}}1  {û}{{\^u}}1
+      {Â}{{\^A}}1  {Ê}{{\^E}}1  {Î}{{\^I}}1 {Ô}{{\^O}}1  {Û}{{\^U}}1
+      {œ}{{\oe}}1  {Œ}{{\OE}}1  {æ}{{\ae}}1 {Æ}{{\AE}}1  {ß}{{\ss}}1
+      {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1  {Ø}{{\O}}1   {å}{{\r a}}1
+      {Å}{{\r A}}1 {ã}{{\~a}}1  {õ}{{\~o}}1 {Ã}{{\~A}}1  {Õ}{{\~O}}1
+      {ñ}{{\~n}}1  {Ñ}{{\~N}}1  {¿}{{?`}}1  {¡}{{!`}}1
+      {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
+      % ¿ and ¡ are not correctly displayed if inconsolata font is used
+      % together with the lstlisting environment. Consider typing code in
+      % external files and using \lstinputlisting to display them instead.      
+  }
+}
+{}
+% ... fin entorno algorithm
+
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\practica}[1]{\subsection*{#1}}
+\newcounter{ejercicio}
+\newcommand{\ejercicio}{\stepcounter{ejercicio}\paragraph*{Ejercicio~\theejercicio.}}
+
+\begin{document}
+
+\practica{Práctica 1}
+% \subsection*{Ejercicio 1}\noindent
+\ejercicio
+Programar una función \texttt{punto\_fijo\_simple(g, x0)} que tome como parámetros una función $g:\Rset \to \Rset$ y un número real (en coma flotante) \texttt{x0} y devuelva el resultado de aplicar el método de punto fijo 
+$$x_{k+1} = g(x_k)$$ a 
+partir del valor inicial $x_0=\texttt{x0}$. Para ello se puede partir del siguiente sencillo algoritmo (escrito en pseudocódigo):
+\begin{algorithm}
+función punto_fijo_simple(g, x0):
+  definir nIter = 100  (número de iteraciones) 
+  definir x = x0  (variable que almacena la solución en cada etapa)
+  repetir nIter veces:
+    definir x = g(x)
+  devolver x
+fin de la función
+\end{algorithm}
+
+\ejercicio
+(a) Dibujar en una misma gráfica las funciones $y=x$ e $y=g(x)$, en $[0,1]$, siendo 
+\begin{equation}
+  \label{eq.g}
+g(x)=\frac{1}{2+x},
+\end{equation} 
+para conjeturar que $g(x)$ tiene un punto fijo en este intervalo.
+(b) Aplicar para la función \texttt{punto\_fijo} anterior para aproximar este punto fijo, partiendo de $x_0=0$. (c) Calcular el residuo de esta aproximación, que definiremos como:
+$$r= x - g(x)$$
+y comprobar que es (prácticamente) nulo%
+\footnote{Siempre será buena idea tener siempre uno o mas \textbf{tests} (basados en el residuo de la ecuación o de otro tipo) que nos den ciertas garantías de que la función programada funciona correctamente. Los tests o pruebas de software son muy importantes en ingeniería informática, ver \href{https://es.wikipedia.org/wiki/Pruebas_de_software}{Wikipedia} (o mejor \href{https://es.wikipedia.org/wiki/Pruebas_de_software}{Wikipedia en inglés})}.
+
+\ejercicio
+Quizás no sean necesarias tantas iteraciones (\texttt{nIter=100}). A continuación se propone: (a) modificar la función \verb|punto_fijo_simple| para que tome dos parámetros más: \texttt{tol} y \texttt{nIter}, que servirán para controlar el número de iteraciones. En concreto el bucle de iteraciones terminará cuando:
+\begin{itemize}
+  \item la diferencia entre dos iteraciones sucesivas sea menor que la tolerancia ($|x_{k}-x_{k-1}|<\texttt{tol}$)
+  \item o bien se alcance el número máximo de iteraciones \texttt{nIter}. 
+\end{itemize}
+Estos parámetros tomarán los siguientes valores por defecto: 
+\texttt{tol=1.e-10}, \texttt{nIter=100}.
+
+El siguiente pseudocódigo puede servir como guía. Como se puede observar, utilizamos dos variables (\texttt{x0} y \texttt{x}) para las aproximaciones en dos etapas consecutivas:
+\begin{algorithm}
+función punto_fijo(g, x0, tol=1.e-10, nIter=100):
+  definir i = 0 (contador de iteraciones)
+  definir diferencia = tol (diferencia entre dos iteraciones)
+  bucle mientras que diferencia>=tol e i<nIter: @\label{loop.line}@
+    definir x = g(x0)
+    diferencia = valor_absoluto(x-x0)
+    incrementar(i)
+    definir x0 = x (¡es importante preparar la siguiente iteración!)
+  devolver x
+fin de la función
+\end{algorithm}
+
+(b) Para probar el nuevo código, se propone volver a calcular el residuo para la función $g(x)$ definida en~(\ref{eq.g}) pero utilizando una tolerancia mayor, \texttt{tol=1.e-3}, y comprobar que el residuo es ahora bastante mayor (la aproximación ha empeorado).
+
+% (c) El «\texttt{bucle mientras que}» introducido en el algoritmo anterior (en la línea~\ref{loop.line}) se puede programar en de distintas formas en \textit{Python}, por ejemplo:
+% \begin{enumerate}
+%   \item Mediante un bucle \texttt{while}
+%   \item Usando un bucle \texttt{for} y la orden \texttt{break}. 
+% \end{enumerate}
+% Programa las dos variantes y comprueba que los resultados son idénticos%
+% \footnote{Puedes documentarte en la bibliografía recomendada o en internet: hay mucha información, por ejemplo \url{https://ellibrodepython.com/break-python}.}.
+%
+
+\ejercicio
+(a) Justificar matemáticamente que la función~(\ref{eq.g}) tiene un punto fijo en $[0,1]$. Para ello, demostrar que $g([0,1])\subset [0,1]$ y que $g$ es contractiva, con constante $\lambda=\max_{x\in [0,1]}|g'(x)| = 1/4$. (b) Usando este valor de $\lambda$ junto a la desigualdad a posteriori estudiada en teoría, calcular el número de iteraciones necesarias para que la aproximación del punto fijo sea menor que $10^{-8}$. Usar la función \texttt{punto\_fijo} anterior para calcular esta aproximación.
+
+\paragraph*{Ejercicios resueltos:} Los ejercicios anteriores están resueltos (con extensiones teóricas que pueden ser muy interesantes como problemas de la asignatura) en las prácticas de ordenador, a las que se accede desde un enlace en el campus virtual. Concretamente: \url{https://nbviewer.org/github/rrgalvan/python-mnii/blob/master/1-ceros-de-funciones/Problema-2.ipynb}
+
+\end{document}

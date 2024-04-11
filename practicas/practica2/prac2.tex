@@ -1,0 +1,107 @@
+\documentclass[11pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{xspace}
+\usepackage[margin={2cm,1.7cm}]{geometry}
+\usepackage{../cabecera-UCA}
+\renewcommand{\baselinestretch}{1.1}
+\parskip=0.5em
+% \pagestyle{empty}
+\usepackage{amsfonts, amsmath}
+\usepackage{hyperref}
+
+% Entorno "algorithm" para pseudocódigo...
+\usepackage{listings}
+\usepackage{colordvi}
+\lstnewenvironment{algorithm}[1][] %defines the algorithm listing environment
+{   
+    \lstset{ %this is the stype
+      escapechar=@,  % <-to introduce LaTeX ccommands
+      frame=tb,
+      numbers=left, 
+      numberstyle=\tiny,
+      basicstyle=\tt,
+      keywordstyle=\color{black}\bfseries,
+      keywords={definir} %add the keywords you want, or load a language as Rubens explains in his comment above.
+      xleftmargin=.04\textwidth,
+      aboveskip=12pt,
+      belowskip=5pt,
+    }
+    \lstset{
+    inputencoding = utf8,  % Input encoding
+    extendedchars = true,  % Extended ASCII
+    literate      =        % Support additional characters
+      {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
+      {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
+      {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
+      {À}{{\`A}}1  {È}{{\'E}}1  {Ì}{{\`I}}1 {Ò}{{\`O}}1  {Ù}{{\`U}}1
+      {ä}{{\"a}}1  {ë}{{\"e}}1  {ï}{{\"i}}1 {ö}{{\"o}}1  {ü}{{\"u}}1
+      {Ä}{{\"A}}1  {Ë}{{\"E}}1  {Ï}{{\"I}}1 {Ö}{{\"O}}1  {Ü}{{\"U}}1
+      {â}{{\^a}}1  {ê}{{\^e}}1  {î}{{\^i}}1 {ô}{{\^o}}1  {û}{{\^u}}1
+      {Â}{{\^A}}1  {Ê}{{\^E}}1  {Î}{{\^I}}1 {Ô}{{\^O}}1  {Û}{{\^U}}1
+      {œ}{{\oe}}1  {Œ}{{\OE}}1  {æ}{{\ae}}1 {Æ}{{\AE}}1  {ß}{{\ss}}1
+      {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1  {Ø}{{\O}}1   {å}{{\r a}}1
+      {Å}{{\r A}}1 {ã}{{\~a}}1  {õ}{{\~o}}1 {Ã}{{\~A}}1  {Õ}{{\~O}}1
+      {ñ}{{\~n}}1  {Ñ}{{\~N}}1  {¿}{{?`}}1  {¡}{{!`}}1
+      {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
+      % ¿ and ¡ are not correctly displayed if inconsolata font is used
+      % together with the lstlisting environment. Consider typing code in
+      % external files and using \lstinputlisting to display them instead.      
+  }
+}
+{}
+% ... fin entorno algorithm
+
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\practica}[1]{\subsection*{#1}}
+\newcounter{ejercicio}
+\newcommand{\ejercicio}{\stepcounter{ejercicio}\paragraph*{Ejercicio~\theejercicio.}}
+
+\begin{document}
+
+\practica{Práctica 2}
+% \subsection*{Ejercicio 1}\noindent
+
+
+\ejercicio
+Modificar la función \verb|punto_fijo| programada en la práctica anterior para que devuelva un \textit{array} formado por \textbf{todas las aproximaciones} sucesivas $\{x_0,x_1,\dots,x_{\texttt{n}}\}$ del método de punto fijo, donde $n$ es el número de iteraciones que realizó el algoritmo ($n\le\texttt{nIter}$), antes de finalizar debido a se alcanzó la tolerancia o bien el número máximo de iteraciones especificadas. Para ello:
+\begin{itemize}
+  \item Antes del inicio del bucle definir una lista, \texttt{lista\_x}, que contenga sólo a \texttt{x0}.
+  \item En cada iteración del bucle, añadir a \texttt{lista\_x} el valor de $x$ recién calculado.
+  \item Al final de la función, devolver un \textit{array} (biblioteca \texttt{Numpy}) a partir de \texttt{lista\_x}.
+\end{itemize}
+Se pide:
+\begin{enumerate}
+  \item Comprobar que para la función $g(x)=1/(x+2)$ los resultados coinciden con los obtenidos en la práctica anterior\footnote{Puedes acceder al último elmento de un array \texttt{x} utilizando un índice negativo: \texttt{xx[-1]}}. 
+  \item Utlizando la biblioteca \texttt{Matplotlib}, dibuja una gráfica en las que aparezcan sobre el eje $OX$ los puntos $(x_k, 0)$ para las iteraciones de punto fijo $k=0,1,2,3$.
+\end{enumerate}
+
+\ejercicio
+Utilizar la biblioteca \texttt{Matplotlib} (junto a \texttt{Numpy}) a para dibujar una gráfica que represente la variación del residuo (en valor absoluto), $r_k = |x_k - g(x_k)|$, para $k=0,1,\dots,n$. En concreto: 
+\begin{enumerate}
+  \item Definir el array de residuos, $r$, como el valor absoluto (función \texttt{abs} de \texttt{Numpy}) del array \texttt{x-g(x)}.
+  \item Aplicar la función \texttt{plot} de \texttt{Matplotlib} para representar una gráfica que contenga en el eje $X$ los valores $0,...,n$ y en el eje $Y$ el residuo $r$.
+    \item Investigar el funcionamiento de la función \texttt{bar} de \texttt{Matplotlib} y utilizarla para repteir el apartado anterior.
+\end{enumerate}
+% \ejercicio
+% (Se especificará en clase)
+
+% \ejercicio
+% Vamos a utilizar esta función \verb|punto_fijo|  para aproximar un cero de 
+% \begin{equation*}
+%   % \label{eq.f}
+% f(x)=x-3\arctan(x)+1.
+% \end{equation*}
+% Para ello reescribiremos el problema $f(x)=0$ como una ecuación de punto fijo $x=g(x)$ para
+%   $$
+%   g(x) = 3 \arctan(x) -1
+%   $$
+% \begin{enumerate}
+% \item Utilizando la función \texttt{punto\_fijo} realizar iteraciones $x_k$ a partir de $x_0=1$ con \texttt{tol}$=10^{-7}$. ¿Cuál es, aproximadamente, el límite, $\alpha$? 
+% \item Comprueba que el resultado, no coincide con el cero de $f(x)$ calculado en el ejercicio anterior. ¿Qué puede estar pasando? 
+% \item Calcula la derivada $g'(\alpha)$ y relaciónala con la contractividad de $g$.
+% \end{enumerate} 
+
+
+\end{document}
