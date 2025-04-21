@@ -1,0 +1,71 @@
+---
+title: "Práctica 1. Python y computación numérica"
+author: "J. Rafael Rguez. Galván"
+format: beamer
+---
+
+# El lenguaje Phyton
+
+- Un lenguaje de programación de *propósito general*, de *[alto nivel](https://es.wikipedia.org/wiki/Lenguaje_de_alto_nivel)*, enfocado a la *[programación estructurada](https://es.wikipedia.org/wiki/Programaci%C3%B3n_estructurada)* y a la *[orientación a objetos](https://es.wikipedia.org/wiki/Programaci%C3%B3n_orientada_a_objetos)*.
+- Uno de los [lenguajes de programación más usados](https://www.tiobe.com/tiobe-index/)
+  ![alt text](lenguajes_mas_populares.png "Lista lenguajes")
+
+# Puntos fuertes de Python 
+- Sencillez
+- Amplio ecosistema de herramientas específicas 
+  - Ciencia de datos
+  - Inteligencia artificial
+  - **Computación científica**
+
+# Paquetes numéricos
+- **NumPy**: almacenamiento y cálculo eficientes para *matrices* de datos multidimensionales (*arrays*)
+- **SciPy** implementación de numerosos *algoritmos numéricos* (integración, interpolación, resolución de ecuaciones...)
+- **Matplotlib**: interfaz para *gráficos*
+- **IPython/Jupyter** terminal mejorado y entorno de tipo *cuaderno*, para la creación de documentos interactivos 
+- **Pandas**: Manipulación de *datos*
+- **Scikit-Learn**: proporciona un conjunto de herramientas uniforme para aplicar algoritmos comunes de aprendizaje automático a los datos.
+- ...
+
+# The Zen of Pyton
+
+```
+import this
+
+Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+Special cases aren't special enough to break the rules.
+Although practicality beats purity.
+Errors should never pass silently.
+Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!
+```
+
+# Cómo ejecutar código en Python
+
+Muchas posibilidades, elije la que mejor se adapte a ti
+
+1. Usar directamente el **intérprete de Python**, a través de una terminal (*shell*)
+2. Usar un **editor** de texto, creando un fichero con extensión `.py`. Editores recomendados:
+    * [Visual Studio](https://code.visualstudio.com/), muy potente, fácil de usar, gratuito
+    * [NeoVim](https://neovim.io/), muy potente, difícil para empezar, licencia libre  
+
+3. Usar **Jupyter/IPython notebook** 
+    * Desde un navegador web, desde Visual Studio,...
+    * Ficheros con extesión `.ipynb`
+    * Normalmente, la vía usada en esta asinatura
+
+# Un recorrido por la sintaxis de Python 
+
+[Acceso a la guía en la web](https://nbviewer.org/github/rrgalvan/IntroPythonMasterMatemat/blob/master/02-Basic-Python-Syntax.ipynb)

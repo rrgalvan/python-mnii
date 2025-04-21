@@ -1,0 +1,167 @@
+---
+title: Práctica 7
+author: Rafa Rodríguez Galván
+font-size: 11pt
+---
+
+## Ejercicio 1
+
+Se considera la fórmula de cuadratura
+
+$\int_0^1 \! f(x) \, dx \approx 
+c_{0} f(0) + c_{1}f(\frac{1}{3}) + c_{2} f(\frac{2}{3}) + c_{3} f(1)
+$
+
+1. Calcular los coeficientes $c_{0}, c_{1}, c_{2}, c_{3}$ tales que esta fórmula de cuadratura es exacta para polinomios de grado menor o igual que 3. 
+2. Comprobar computacionalmente que la fórmula resultante proporciona el valor exacto para polinomios de orden $3$ pero no para todos los de orden $4$. Para ello:
+    a. Definir una función `cuad(f)` que aproxime la integral de `f` usando la fórmula de cuadratura. 
+    b. Aplicarla a los monomios $x^k$, $k=0,1,2,3,4$ e imprimir los resultados obtenidos.
+3. Aplicar la fórmula anterior para aproximar la integral en $[0,1]$ de $f(x)=\sin(\pi x)$ y calcular el error.
+4. La función `cuad(f)` antes definida dependerá de algunas variables globales (el vector de nodos $x=(0,1/3,2/3,1)$ y de coeficientes $c_i$). En general, el uso de variables globales es desaconsejable por distintos motivos, en particular podría dar lugar a efectos inesperados al cambiar estas variables. Programa una variante, `cuad(f, x, w)` que aproxime la integral de `f` para nodos y pesos cualesquiera. Úsala para verificar que la fórmula de cuadratura del trapecio en $[a,b]=[0,1]$  tiene orden 2
+
+### Solución:
+
+#### Apartado 1
+
+Para que la fórmula tenga orden 3 (exacta hasta polinomios de grado 3) se deben cumplir las siguientes ecuaciones:
+
+$E_{0}(x^0)= 0 \Rightarrow 1 = \int_0^1 \! 1 \, \mathrm{d}x= c_{0}+c_{1}+c_{2}+c_{3}$
+
+$E_{1}(x^1)= 0 \Rightarrow \frac{1}{2} =\int_0^1 \! x \, \mathrm{d}x=  \frac{c_{1}}{3}+\frac{2c_{2}}{3}+c_{3}$
+ 
+$E_{2}(x^2)= 0 \Rightarrow \frac{1}{3} =\int_0^1 \! x^2 \, \mathrm{d}x=  \frac{c_{1}}{9}+\frac{4c_{2}}{9}+c_{3}$
+ 
+$E_{3}(x^3)= 0 \Rightarrow \frac{1}{4} = \int_0^1 \! x^3 \, \mathrm{d}x=  \frac{c_{1}}{27}+\frac{8c_{2}}{27}+c_{3}$
+
+##### Resolución (con Numpy)
+
+Para resolver este sistema de 4 ecuaciones con vector de incógnitas $c=(c_0, c_1, c_2, c_3)$, usamos la función `solve`, que está en un submódulo de `numpy` llamado "`linalg`". Para ello debemos escribirlo de forma matricial (la matriz del sistema es de tipo *Vandermonde*, pues resulta de la evaluación en los nodos de cuadratura de monomios del tipo $x^n$):
+
+```{python}
+import numpy as np
+from numpy.linalg import solve
+
+x = np.array([0, 1/3, 2/3, 1])
+
+A = np.array([[1, 1, 1, 1], [0, 1/3, 2/3, 1], [0, 1/9, 4/9, 1], [0, 1/27, 8/27, 1]]) 
+b = np.array([1, 1/2, 1/3, 1/4])
+
+c = solve(A, b)
+print(c)
+```
+
+#### Apartado 2
+
+Mostramos aquí tres versiones. La primera, usando la definición de esta fórmula de cuadratura, es muy poco general, solemente es apropiada para los 4 nodos y pesos calculados anteriormente:
+```{python}
+def cuad(f):
+    return c[0]*f(0) + c[1]*f(1/3) + c[2]*f(2/3) + c[3]*f(1)
+```
+
+La segunda es más general, aunque no muy eficiente computacionalmente:
+```{python}
+def cuad(f):
+    suma = 0
+    for i in range(4):
+        suma += c[i]*f(x[i])
+    return suma
+```
+
+La mejor opción (la más eficiente computacionalmente) es usar funciones predefinidas de numpy, siempre que sea posible, que quizás estén precompiladas en C o en otro lenguaje. En este caso, usamos la función `np.sum`, para sumar los elementos del *array* `c*f(x)`. Recordemos que el producto de dos arrays de numpy (vectores, matrices) devuelve el resultado de multiplicarlos elemento a elemento (en este caso, `c*f(x)` es el array que resulta de multiplicar cada $c_i$ por $f(x_i)$).
+```{python}
+def cuad(f):
+    return np.sum(c*f(x))
+```
+
+Con esta función podemos verificar que la fórmula definida es exacta para polinomios de grado tres:
+
+```{python}
+for k in range(4):
+    print(f"Integral en [0,1] de x**{k}: {1/(k+1)}", end=" | ")
+    print(f"Aproximación para x**{k}: {cuad(lambda x: x**k)}")
+```
+
+Pero existe algún polinomio de grado 4 para el que la fórmula no es exacta. por ejemplo, $x^4$:
+```{python}
+k=4
+print(f"Aproximación para x**{k}: {cuad(lambda x: x**k)}", end=" | ")
+print(f"integral en [0,1] de x**{k}: {1/(k+1)}")
+```
+
+#### Apartado 3
+Puesto que
+$$
+\int_0^1 \sin(\pi x) = \left[\frac{1}{\pi} \cos(\pi x)\right]_0^1 = \frac{2}{\pi},
+$$
+tenemos:
+```{python}
+f = lambda x: np.sin(np.pi*x)
+
+int_f = 2/np.pi
+cuad_f = cuad(f)
+error = abs(int_f - cuad_f)
+print(f"Integral en [0,1] de sin(pi*x): {int_f}")
+print(f"Aproximación para sin(pi*x): {cuad_f}")
+print(f"Error: {error}")
+```
+
+## Ejercicio 2
+
+El código anterior se puede generalizar y mejorar de varias maneras. Aquí se proponen algunas ideas/retos para ello.
+
+### 1. Generalización a $n+1$ puntos (con Numpy)
+- Dado el intervalo $[0,1]$ y los nodos $0=x_0<x_1<...<x_n=1$, definir una función `pesos_optimos(x)` que devuelva el vector de pesos $c$ tales que la fórmula de cuadratura
+$$
+\sum_{i=0}^n c_i f(x_i) 
+$$
+tenga orden igual o mayor que $n$ (es decir, sea exacta para polinomios de grado $n$). Para ello, se puede usar la función `solve` de `linalg` para resolver el sistema de ecuaciones con matriz de Van der Monde ($A=(a_{ij})$, con $a_{ij}=x_j^i$, con $i,j=0,...,n$) y segundo miembro $B=(b_i)$ con $b_i=\int_0^1 x^i = (1^{i+1}-0^{i+1})/(i+1) = 1/(i+1)$.
+
+- Se propone aplicar la función `pesos_optimos` para el caso anterior ($n=3$) y comporbar que se obtienen los mismos resultados.
+
+- Lo anterior sería fácilmente generalizable a cualquier intervalo $[a,b]$ (sólo hay que cambiar el vector $B$).
+
+
+### Fórmulas de cuadratura y orientación a objetos
+
+Para evitar el uso de variables locales, se podrían utilizar objetos de tipo "fórmula de cuadrtura". Cada uno de estos objetos representaría una fórmula concreta (como la del punto medio, la de los trapecios, la de Simpson, etc), que está determinada por dos arrays:
+- Vector de nodos
+- Vector de pesos
+
+Los objetos de esta clase tendrán un un método (una función) `cuad(f)` que aproximará la integral de una función `f` usando estos dos vectores `nodos` y `pesos`
+
+Se propone definir una clase `FormCuadratura` y un objeto `micuad` que represente la fórmula de cuadratura definida en el Ejercicio 1. Comprobar de nuevo que la fórmula tiene orden $3$ (exacta para polinomios de grado 3)
+
+### Solución:
+
+#### Apartado 1
+```{python}
+def pesos_optimos(x):
+    n = len(x) - 1  # len(n) = n+1
+    A = np.array([x**i for i in range(n+1)])
+    print(A)
+    B = np.array([1/(i+1) for i in range(n+1)])
+    print(B)
+    c = solve(A, B)
+    return c
+
+print("x =", x)
+print("Pesos óptimos:", pesos_optimos(x))
+```
+
+#### Apartado 2
+
+```{python}
+class FormCuadratura:
+  def __init__(self, x, c):
+    self.nodos = x
+    self.pesos = c
+  def cuad(self, f):
+    return np.sum(self.pesos*f(self.nodos))
+
+print("x =",x, "\nc =", c)
+micuad = FormCuadratura(x, c)
+for k in range(4):
+    print(f"Integral en [0,1] de x**{k}: {1/(k+1)}", end=" | ")
+    print(f"Aproximación para x**{k}: {micuad.cuad(lambda x: x**k)}")
+```
+

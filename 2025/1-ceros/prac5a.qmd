@@ -1,0 +1,221 @@
+---
+jupyter: python3
+title: Práctica 5
+author: Rafa Rguez Galván
+---
+Consideremos la función
+
+$$f(x)=x-3\arctan(x)+1$$
+
+1. Definir $f$ en Python como una función *lambda*. Representar la gráfica de $f$ y conjeturar, a la vista de ella, la existencia de tres raíces localizadas respectivamente en $[-6,-4]$,  $[0,1]$ y $[2,5]$. Para dibujar las gráficas de forma personalizada, crear una función `migráfica` que reciba, al menos, los siguientes parámetros: `f` (función compatible con Numpy a dibujar) e `intervalo_x` (lista o tupla que define el dominio de la gráfica).
+
+2. Utilizando la biblioteca de cálculo simbólico `sympy`, calcular la expresión simbólica de $f'$. Utilizar la función `lambdify` de `scipy` para definir la función Python `df(x)` correspondiente a $f'$ y representarla gráficamente. A la vista de la expresión simbólica de $f'$, demostrar (en una celda *markdown*) que, en el intervalo $[2,+\infty]$, existe una única solución, $\alpha$, de $f(x)=0$. 
+
+3. Calcular con `sympy` la expresión de $f''$. Utilizar la función `subplots` de *matplotlib* para crear una figura con una fila y tres columnas de cajas de ejes de coordenadas. Representar en ellos las gráficas de $f$, $f'$ y $f''$ en el intervalo $[2,5]$ y, a la vista de ellas, conjeturar si se verifican las hipótesis $(N1)$, $(N2)$ y $(N3)$ del Teorema global para el método de Newton. Estudiar por último, para este caso, la hipótesis $(N4)$.
+
+2. Programar una función `newton(f, df, x0, tol=1e-15, maxiter=100)` aproxime el cero de `f` (con derivada `df`) mediante el método de Newton partiendo de `x0`. La función realizará un máximo de `maxiter` iteraciones, deteniéndose si la diferencia entre dos iteraciones consecutivas es menor que la tolerancia `tol`, y devuelva una tupla `(x,k)` dodne `x` es la última aproximación y `k` es el número de iteraciones realizadas.
+
+
+
+# Apartado 1
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+```
+
+```{python}
+def migráfica(f, intervalo_x, ancho_línea=2, ancho_ejes=1):
+    """
+    Dibuja una gráfica de la función f (con matplotlib) 
+    en el intervalo [a,b] dado por la tupla o lista 
+    intervalo_x
+    """
+    a, b = intervalo_x
+    x = np.linspace(a, b, num=300)
+    plt.grid()
+    plt.axhline(c="black", lw=ancho_ejes)
+    plt.axvline(c="black", lw=ancho_ejes)
+    plt.plot(x, f(x), linewidth=ancho_línea)
+```
+
+```{python}
+# Definimos f como la función lambda "x -> x-3*arctan(x)+1"
+f = lambda x: x - 3*np.arctan(x) + 1
+```
+
+```{python}
+migráfica(f, (-10,10))
+```
+
+## Apartado 2
+
+Definimos la variable "x" como un objeto simbólico, `x`, y a partir de él definimos expresión simbólica de $f$, a la que llamaremos `f_s`. 
+
+```{python}
+import sympy as sp
+
+x = sp.symbols("x")         # Definimos una variable simbólica
+f_s = x - 3*sp.atan(x) + 1  # Creamos una expresión simbólica
+```
+
+Obsérvese que `f_s ` **no es una función**, sino un objeto de *sympy*, y no podemos evaluar directamente $f(0)$. Eso sí, en `f_s`, podemos sustuir `x` por cualquier otra expresión simbólica o numérica.
+```{python}
+# f_s(0) daría un error, pero podemos sustituir x por 0
+f_s.subs(x, 0)
+```
+
+Si deseamos definir la función de Python correspondiente a `f_s`, podemos utilizar la función `lambdify` de *sympy* (que devuelve la *función lambda* correspondiente).
+```{python}
+# Crear la función "lambda"  x -> f_s
+f = sp.lambdify(x, f_s)
+migráfica(f, (-10,10))
+```
+
+Ahora podemos calcular $f'$ (usando `sp.diff(f_s,x)` o `fs.diff(x)`) y representarla gráficamente.
+```{python}
+df_s = f_s.diff(x) # Expresión simbólica de la derivada primera
+df_s
+```
+
+```{python}
+df = sp.lambdify(x, df_s) # Función derivada primera
+migráfica(df, intervalo_x=(-10,10))
+```
+
+### Demostremos que $f$ tiene un único cero en $[2,+\infty)$
+
+$f$ es continua y derivable en $\mathbb R$, por ser composición de funciones derivables. 
+Observando la expresión simbólica de $f'$, si $x\ge 2$, entonces $x^2+1 \ge 2^2+1 = 5$ y así
+
+$$
+\frac{3}{x^2+1} \le \frac 3 5
+$$
+
+Por tanto
+$$
+f'(x) = 1 - \frac{3}{x^2+1} \ge 1 - \frac 3 5 \ge 0.
+$$
+
+Entonces $f$ es estrictamente creciente en $[2,+\infty)$, luego **si existe algún cero, este es único**.
+
+La existencia quedará garantizada si estamos en las hipótesis del teorema de Bolzano. Por ejemplo en $[2,5]$:
+
+```{python}
+f(2), f(5)
+```
+El siguiente código queda más bonito y la última línea daría un error si no se verifican las condiciones de Bolzano (puedes comprobarlo)
+```{python}
+a, b = 2, 5
+if f(a) < 0 and f(b) > 0 or f(a) > 0 and f(b) < 0:
+  print("Cambio de signo en [a,b]")
+else:
+  print("No cambio de signo en [a,b]")
+
+assert f(a) < 0 and f(b) > 0 or f(a) > 0 and f(b) < 0
+```
+
+
+## Apartado 3
+
+```{python}
+# Derivada segunda
+df2_s = sp.diff(f_s, x, 2)
+df2_s
+```
+
+```{python}
+df2 = sp.lambdify(x, df2_s)
+migráfica(df2, intervalo_x=(-5,5))
+```
+
+```{python}
+# Figura con las gráficas de f, f' y f'' en [0,5]
+
+fig, ax = plt.subplots(1, 3, figsize=(10,3))   # Tamaño 6 x 3
+
+a, b = 2, 5
+x = np.linspace(a, b, num=300)
+
+ax[0].set_title("$f(x)$", c="blue")
+ax[0].plot(x, f(x), c="blue")
+
+ax[1].set_title("$f'(x)$", c="red")
+ax[1].plot(x, df(x), c="red")
+
+ax[2].set_title("$f''(x)$", c="darkgreen")
+ax[2].plot(x, df2(x), c="darkgreen")
+
+for i in range(3):
+    ax[i].grid()
+    ax[i].axhline(c="black")
+    ax[i].axvline(c="black")
+```
+
+A la vista de las gráficas, las hipótesis $(N1)$ ($f$ cambia de signo), $(N2)$ ($f'>0$) y $(N3)$ ($f''>0$ )se verifican en $[2,5]$. 
+
+Estudiamos la hipótesis $(N4)$:
+```{python}
+a,b
+```
+
+```{python}
+abs(f(a)/df(a))
+```
+
+```{python}
+abs(f(b)/df(b))
+```
+
+```{python}
+max_abs = max(abs(f(a)/df(a)), abs(f(b)/df(b)))
+long_intervalo = b-a
+
+print(f"max_abs={max_abs}")
+print(f"long_intervalo={long_intervalo}")
+if max_abs < long_intervalo:
+  print("  => Se verifica la hipótesis (N4)")
+else:
+  print("  => No se verifica la hipótesis (N4)")
+```
+
+## Apartado 4
+
+```{python}
+def newton(f, df, x0, tol=1e-15, maxiter=100):
+    """Cálculo de una solución de $f(x)=0$ mediante el método de Newton.
+    
+    Argumentos:
+        f: Función considerada
+        df: Función derivada de f
+        x0 : Estimación inicial
+        tol: Tolerancia (diferencia entre dos iteraciones sucesivas)
+        maxiter: Número máximo de iteraciones admitidas
+    Valores devueltos: (x, niter) con
+        x: Aproximación del punto fijo
+        niter: Número de iteraciones realizadas
+    """
+    k = 0
+    diferencia = tol
+    while k<maxiter and diferencia >= tol:    
+        x1 = x0-f(x0)/df(x0) # Iteración de Newton
+        diferencia = abs(x1-x0) # Preparamos la siguiente iteración
+        x0 = x1 
+        k = k+1
+        
+    # Si se llegó al número máximo de iteraciones, lanzar una excepción 
+    if k==maxiter: 
+        raise ValueError("Error de convergencia!") 
+        
+    # Si todo fue bien, devolvemos la solución y el número de iteraciones
+    return x1, k 
+```
+
+```{python}
+aprox, niter = newton(f, df, x0=3.5)
+print("Solución aproximada:", aprox)
+print("Número de iteraciones:", niter)
+print("Resíduo:", f(aprox))
+```
+
+

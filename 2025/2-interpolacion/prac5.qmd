@@ -1,0 +1,159 @@
+---
+title: Práctica 5
+Author: Métodos Numéricos II
+---
+
+Calcular el polinomio de de Lagrange que interpola los valores $\{1, -4, 8, -16\}$ en los nodos $\{0.1, 0.2, 0.4, 0.8\}$. 
+
+Para ello, utilizaremos tres estrategias:
+
+1. La función `lagrange`, incluída en módulo `scipy.interpolate` de  *Python*.
+2. La fórmula de Lagrange
+3. La fórmula de Newton (diferencias divididas)
+
+Para cada caso, representar la gráficamente la función y el polinomio de interpolación. Será más fácil si se define una función que dibuje la gráifica. 
+
+# Apartado 1
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+```
+
+```{python}
+x = np.array([0.1, 0.2, 0.4, 0.8])
+y = np.array([1, -4, 8, -16])
+```
+
+```{python}
+from scipy.interpolate import lagrange
+p = lagrange(x, y)
+print("p es un objeto de tipo", type(p))
+print("Su representación es:")
+print(p)
+print("Sus coeficiente son:", p.coef)
+print("Su valor en x=0.3 es:", p(0.3))
+```
+
+```{python}
+def graf_interpol(x, y, p):
+  """
+  Gráfica de la función $f$ y su polinomio de interpolación $p$ 
+  sobre el soporte $x$.
+  """
+  fig, ax = plt.subplots()
+  ax.plot(x, y, 'o', label="datos")
+  x_fina = np.linspace(x[0], x[-1], 100)
+  ax.plot(x_fina, p(x_fina), lw=2, label="p(x)")
+  ax.set_title("Polinomio de interpolación")
+  ax.grid()
+  ax.legend()
+  plt.show()
+```
+
+```{python}
+graf_interpol(x, y, p)
+```
+
+# Apartado 2
+
+Fórmula de Lagrange:
+
+```{python}
+x0, x1, x2, x3 = x  # Por comodidad al escribir
+y0, y1, y2, y3 = y
+L0 = lambda x: (x-x1)*(x-x2)*(x-x3)/((x0-x1)*(x0-x2)*(x0-x3))
+L1 = lambda x: (x-x0)*(x-x2)*(x-x3)/((x1-x0)*(x1-x2)*(x1-x3))
+L2 = lambda x: (x-x0)*(x-x1)*(x-x3)/((x2-x0)*(x2-x1)*(x2-x3))
+L3 = lambda x: (x-x0)*(x-x1)*(x-x2)/((x3-x0)*(x3-x1)*(x3-x2))
+
+def p_lagrange(x): 
+  # Evaluar el polinomio de interpolación en un punto x. 
+  # ¡Atención! esta función usa las variables globales y0, y1, y2, y3
+  # y las funciones base L0, L1, L2, L3
+  return y0*L0(x) + y1*L1(x) + y2*L2(x) + y3*L3(x)
+
+def p_lagrange_v2(x): 
+  # Segunda versión
+  # ¡Atención! esta función usa la variable global y
+  # junto las funciones base L0, L1, L2, L3
+  L = [L0, L1, L2, L3]
+  suma = 0
+  for i in range(4):
+    suma += y[i]*L[i](x)
+  return suma
+
+graf_interpol(x, y, p_lagrange)
+```
+# Apartado 3
+
+Para cada $k\in\mathbb N$, almacenaremos en una lista todas las diferencias divididas de Newton de orden $k$. Será muy útil utilizar [*listas definidas por comprehension*](https://docs.python.org/3.10/tutorial/datastructures.html?highlight=list%20comprehension). De forma muy análoga al modo en que en matemáticas definimos conjuntos por comprensión, por ejemplo
+\begin{align*}
+\{ x=2n \mid n\in\mathbb N, \ n<7 \} &\quad\text{(seis primeros números pares)}, \\
+\{ x=3^n \mid n=2, 3, 4 \} &\quad\text{(tres potencias de 3)},
+\end{align*}
+en Python podemos esciribir:
+```{python}
+primeros_pares = [2*n for n in range(1,7)]
+print("Seis primeros números pares:", primeros_pares)
+
+potencias_de_3 = [3**n for n in (2, 3, 4)]
+print("Potencias de 3:", potencias_de_3)
+```
+### Diferencias divididas de Newton
+Partimos de
+```{python}
+print("x:", x)
+print("y:", y)
+```
+
+Diferencias orden 0:
+```{python}
+df0 = y
+print("Diferencias de orden 0:", df0)
+```
+
+
+Diferencias orden 1:
+```{python}
+df1 = [ (y[1]-y[0])/(x[1]-x[0]), (y[2]-y[1])/(x[2]-x[1]), (y[3]-y[2])/(x[3]-x[2]) ]
+print(df1)
+```
+O, equivalentemente:
+```{python}
+df1 = [ (df0[i+1]-df0[i])/(x[i+1]-x[i]) for i in range(len(df0)-1) ]
+print("Diferencias de orden 1:", df1)
+```
+
+Diferencias orden 2:
+```{python}
+df2 = [ (df1[i+1]-df1[i])/(x[i+2]-x[i]) for i in range(len(df1)-1) ]
+print("Diferencias de orden 2:", df2)
+```
+
+Diferencias orden 3:
+```{python}
+df3 = [ (df2[i+1]-df2[i])/(x[i+3]-x[i]) for i in range(len(df2)-1) ]
+print("Diferencias de orden 3:", df3)
+```
+
+Polinomio de interpolación de Lagrange:
+```{python}
+def p_newton(t):
+  # Evaluar el polinomio de interpolación en un punto t. 
+  # ¡Atención! esta función usa las variables globales x, df0, df1, df2, df3
+  return df0[0] + df1[0]*(t-x[0]) + df2[0]*(t-x[0])*(t-x[1]) \
+    + df3[0]*(t-x[0])*(t-x[1])*(t-x[2])
+
+graf_interpol(x, y, p_newton)
+```
+
+### Extensión: 
+Más allá de esta práctica, se propone la siguiente extensión, como reto para quienes lo deseen realizar:
+
+1. Programar una función `p_lagrange(x, y)` que permita calcular el polinomio de interpolación de Lagrange usando la **fórmula de Lagrange** sobre $n$ nodos y $n$ datos (`x`, `y`), siendo $n$ cualquier número natural.  *Indicación*: Los produdctos del tipo $(x-x_0)\dots (x-x_n)$ se pueden calcular mediante un bucle, de forma similar a los sumatorios. *Indicación 2*: `p_lagrange(x, y)` podría construir y evolver una función `p(t)`, que al evaluarla en `t` devuelva el valor del polinomio.
+2. Crear otra función función `p_newton(x, y)` que calcule el polinomio de Lagrange usando la **fórmula de Newton**. *Indicación*: Las diferencias divididas de Newton son fórmulas recursivas.
+3. El utilizar variables globales dentro de una función es, en general, una mala práctica. Se podría utilizar programación orientada a objetos para definir variables (atributos) propios de cada objeto.
+
+
+

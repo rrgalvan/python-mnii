@@ -1,0 +1,142 @@
+--- 
+title: Práctica 3
+format: pdf
+---
+
+## Problema 1
+Sea
+$$
+f(x) = x^2 e^x -1
+$$
+
+### Apartado 1
+
+- Representar gráficamente la función $f$ y comprobar (heurísticamente) que esta función tiene un único cero, $\alpha$. 
+- Explorar (en internet, en manuales de Python,...) opciones que permitan mejorar el aspecto visual de la gráfica  (rango de valores en el eje $OY$, visualización de ejes de coordenadas, tamaño de la gráfica, color, título....).
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+a, b = -10, 3
+x = np.linspace(a, b, num=200)
+
+def f(x): return x**2 * np.exp(x) - 1
+plt.title(r"$f(x) = x^2 e^x - 1$")
+plt.ylim((-1,5))
+plt.axhline(color='k')
+plt.axvline(color='k')
+plt.grid()
+plt.plot(x, f(x), linewidth=3)
+```
+### Apartado 2
+Programar la función `bisección(f, a, b, n_iter)` que implemente el método de bisección para aproximar el cero de $f$ en el intervalo $[a,b]$ con `n_iter` iteraciones. La función devolverá el punto medio del último intervalo.
+
+Realizaremos tres variantes:
+
+1. Mediante bucle `for`
+2. Mediante bucle `while`
+3. De forma recursiva
+
+
+```{python}
+def biseccion(f, a, b, n_iter, verb=False):
+  """
+  Implementa el método de bisección para aproximar el cero def en el intervalo [a,b] con n_iter iteraciones
+
+  La funcción devuelve el último punto medio
+  """ 
+
+  for i in range(n_iter):  # i=0, 1, ..., n_iter-1
+    if verb: 
+      print("Iteración: ", i)
+    pto_medio = (a+b)/2 
+    if f(pto_medio) == 0:
+      if verb: 
+        print("He tenido suerte ;), iteración: ", i)
+      break 
+    if f(a)*f(pto_medio) < 0: 
+      b = pto_medio  # El cero está en el intervalo de la izqda
+    else:
+      a =  pto_medio  # El cero está en el intervalo de la dcha
+  return (a+b)/2, i
+```
+
+```{python}
+def biseccion_while(f, a, b, n_iter):
+  """
+  Implementa el método de bisección para aproximar el cero def en el intervalo [a,b] con n_iter iteraciones
+
+  La funcción devuelve el último punto medio
+  """ 
+
+  i = 0
+  while i < n_iter:
+    pto_medio = (a+b)/2 
+    if f(pto_medio) == 0:
+      print("He tenido suerte ;)")
+      return pto_medio 
+    if f(a)*f(pto_medio) < 0: 
+      b = pto_medio  # El cero está en el intervalo de la izqda
+    else:
+      a =  pto_medio  # El cero está en el intervalo de la dcha
+    i = i + 1
+  return (a+b)/2
+```
+
+
+```{python}
+def biseccion_recursiva(f, a, b, n_iter):
+  """
+  Implementa el método de bisección para aproximar el cero def en el intervalo [a,b] con n_iter iteraciones
+
+  La funcción devuelve el último punto medio
+  """ 
+
+  # Caso base
+  pto_medio = (a+b)/2 
+  if n_iter == 0: 
+    return punto_medio
+  else: # Caso recursivo
+    if f(pto_medio) == 0:
+      print("He tenido suerte ;)")
+      return pto_medio 
+    if f(a)*f(pto_medio) < 0:  # Izquierda
+      return biseccion_recursiva(f, a, pto_medio, n_iter-1) 
+    else: # Derecha
+      return biseccion_recursiva(f, pto_medio, b, n_iter-1)
+```
+
+### Apartado 3
+
+Aproximar el cero de la función anterior y comprobar que el resultado devuelto es correcto, de dos formas distintas:
+
+1. Comprobando que el resíduo (es decir, el valor de la función en la aproximación de $\alpha$) es aproximadamente igual a cero.
+2. Comparando el resultado con el que devuelve la función `fsolve` del paquete `scipy`.
+
+```{python}
+aprox, iteraciones = biseccion(f, a, b, n_iter=20)
+print("Aproximación: ", aprox)
+print("Iteraciones: ", iteraciones)
+
+# Estudio del resíduo
+print("Resíduo: ", f(aprox))
+
+# Comprobando con scipy
+from scipy.optimize import fsolve
+alpha = fsolve (f, x0=1)
+print("Aproximación de fsolve: ", alpha[0])
+```
+
+### Apartado 4
+
+#### Programar mejoras para la función `bisección`
+
+- Incluir un parámetro optativo `verb` que permita activar un modo *verboso* o elocuente, en el que se muestre por pantalla abundante información. Por ejemplo, para cada iteración, el sub-intervalo de bisección
+- Hacer que la función `bisección` devuelva, además de una aproximación del cero, el número de iteraciones realizadas efectivamente. ¿Por qué podrían realizarse menos iteraciones que el número indicado, `n_iter`?
+- Hacer que, optativamente, se devuelva una lista con todas las aproximaciones intermedias (puntos medios de los intervalos)
+
+#### Otras ideas
+- Representar gráficamente el resíduo con respecto al número de iteraciones. ¿El resíduo converge a cero, aparentemente? ¿Es estrictamente decreciente a cero?
+
+

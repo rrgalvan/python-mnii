@@ -1,0 +1,59 @@
+--- 
+title: Práctica 5
+author: Rafa Rguez. Galván
+format: 
+  html
+---
+
+Consideremos la función
+
+$$f(x)=x-3\arctan(x)+1$$
+
+1. Representar la gráfica de $f$ y conjeturar, a la vista de ella, la existencia de otras tres raíces, $\alpha_1\in[-6,-4]$, $\alpha_2\in [0,1]$ y $\alpha_3\in[2,4]$.
+
+2. Calcular $f'(x)$ utilizando el paquete `sympy` y, a la vista del resultado, demostrar que, en el intervalo $[2,+\infty)$, existe una única solución, $\alpha_3$, de $f(x)=0$. 
+
+3. Programar una función que realice un número dado de iteraciones del método de Newton y devuelva una lista, llamada `lista_x` , formada por todas las iteraciones, $x_k$, realizadas
+
+4. Partiendo de $x_0=2$, calcular el número de iteraciones necesarias para aproximar $\alpha_1$ mediante el método de Newton con un error menor que $\varepsilon=10^{-15}$. Para ello, utilizar la función programada en el apartado anterior. Mostrar una tabla con todas las iteraciones realizadas (por ejemplo, se puede usar la función `print` o, mejor el paquete *pandas*, véase el Problema-0 del Tema1).
+
+
+# Apartado 1
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+f = lambda x: x-3*np.arctan(x)+1
+
+def myplot(f, x_interval):
+  a, b = x_interval
+  x = np.linspace(a, b,num=300)
+  plt.plot(x,f(x), lw=3)
+  plt.axhline(c='k'); plt.axvline(c='k')
+  plt.grid()
+
+myplot(f, x_interval=(-6, 4))
+```
+
+# Apartado 2
+
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import sympy as sp
+
+fs = lambda x: x-3*sp.atan(x)+1
+x = sp.Symbol('x')
+fs(x)
+sp.plot(fs(x))
+
+Dfs = sp.diff(fs(x))
+sp.plot(Dfs)
+print("Derivada:")
+sp.print_latex(Dfs)
+f = sp.lambdify(x,fs(x))
+myplot(f, x_interval=(-6, 4))
+
+```

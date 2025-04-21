@@ -1,0 +1,90 @@
+---
+title: Práctica 6
+author: Rafa Rodríguez Galván
+font-size: 11pt
+---
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import lagrange
+```
+
+## Ejercicio 1
+
+Consideremos en el intervalo $[-1,1]$ la función
+\begin{equation*}
+     f(x) = \frac{1}{1+25x^2}
+\end{equation*}
+junto a un soporte de $n+1$ puntos equiespaciados en $[-1,1]$.
+
+Nos proponemos representar gráficamente la función junto los polinomios de interpolación de Lagrange, $p_n(x)$, con grados $n=\{ 4, 8, 12, 16, 20 \}$, comprobando gráficamente cómo el error aumenta con $n$ (fenómeno de Runge).
+
+Para ello se propone:
+
+1. Crear una figura con cuatro filas, cada una de ellas representando un sistema de ejes de coordenadas (*subplots*).
+2. Sean los grados de polinomios `n=[4 8, 12, 16]`. Para $i=0,1,2,3$:
+    a. Calcular nodos equiespaciados en $[-1,1]$ (correspondientes a $n_i+1$ puntos) 
+
+    b. Calcular el polinomio de interpolación de $f$ en estos nodos. Para ello puedes usar la función `lagrange` de `scipy.interpolate`. O mejor, aunque más difícil, tu propia función que calcule el polinomio de interpolación de grado $n$ (usando, por ejemplo, la fórmula de Newton).
+
+    c. Representar gráficamente la función en el $i$-esimo sistema de ejes junto a los nodos y el polinomio de interpolación
+
+    d. Para polinomio, calcular e imprimir en el título de la gráfica el error en norma $\infty$ (el máximo error)
+
+Nota: después de representar las gráficas, puede ser buena idea usar la función `fig.tight_layout()` para ajustar el espaciado entre los sistemas de ejes (lo que es conveniente si cada uno tiene su propio título).
+
+
+```{python}
+f = lambda x: 1/(1+25*x**2)
+
+grado_p = [4*i for i in range(1,6)]
+fig,ax = plt.subplots(nrows=len(grado_p), figsize=(8,15))
+x = np.linspace(-1,1,500)
+
+for i in range(len(grado_p)):
+  nodos = np.linspace(-1,1,grado_p[i]+1)
+  p = lagrange(nodos, f(nodos))
+  max_error = max(abs(f(x) - p(x)))
+  título = f"Grado del polinomio: n={grado_p[i]}, " +\
+    r"$||f-p_n||_\infty$" + f"={max_error:.2f}"
+  ax[i].set_title(título)
+  ax[i].grid()
+  ax[i].axhline(0, c='k', lw=0.6)
+  ax[i].axvline(0, c='k', lw=0.6)
+  ax[i].plot(x, f(x), c='k', lw=1)
+  ax[i].plot(nodos, f(nodos), 'o')
+  ax[i].plot(x, p(x), lw=2 )
+
+fig.tight_layout()  # Ajustar espaciado entre subplots
+```
+
+## Ejercicio 2
+
+Nos proponemos interpolar una curva (una función desconocida) sobre una imagen. Para ello se propone:
+
+1. Localizar una imagen de tu interés que contenga una curva que interpretaremos como nuestra función desconocida, $f(x)$. Como ejemplo, partiendo de la imagen `UCA-CASEM.png` que puede descargarse de [esta página web](https://raw.githubusercontent.com/rrgalvan/python-mnii/master/2-interpolacion/UCA-CASEM.png), podemos interpolar el techo de este edificio de la Universidad de Cádiz, aunque será más divertido si interpolas a tu héroe de cómic, a tu perro, a tu gato `:-)`...
+
+   ![](./CASEM-interpol.png)
+
+
+2. Después de descargar esta imagen, copiarla hacia la carpeta donde se almacenan los ficheros `.ipynb`
+
+3. Representar gráficamente la imagen, usando las órdenes `imread` e `imshow` de `matplotlib` de forma similar a:
+```{python}
+img = plt.imread("UCA-CASEM.png")
+plt.imshow(img)
+```
+  > Como curiosidad: la variable `img` devuelta por `imread` es un array de `numpy` que contiene, para cada pixel $(i,j)$, tres valores *RGB* (*red-green-blue*) junto a un cuarto valor de transparencia. Sería fácil aplicar efectos a la imagen, por ejemplo convertirla a escala de grises. ¿Se te ocurre cómo? Inténtalo si tienes tiempo.
+
+4. Considerar el intervalo $[a,b]$ dado por el número de pixels horizontales de la imagen, que podrá observarse con `imshow` y confirmarse con `img.shape` (por ejemplo, para el la imagen del CASEM, $[a,b]=[0,600]$). Definir una lista de nodos, $x_i$, equiespaciados en $[a,b]$. Intentar encontrar heurísticamente (probando y corrigiendo la posición $y$) una lista de valores, $y_i$ de forma que que los puntos $(x_i, y_i$) esten (aproximadamente) situados en la curva de interés
+
+5. Representar, junto a la imagen, el polinomio de interpolación de Lagrange en estos puntos, para aproximar el dibujo  (puedes usar la función `lagrange` de `scipy.interpolate`)
+
+6. Repetir el proceso de interpolación mediante *splines* cúbicos. Puedes utilizar la función `interp1d` (contenida en `scipy.interpolate`), con la opción `kind="cubic"`
+
+7. Comparar los resultados. ¿Alguna de las interpolaciones presenta oscilaciones? ¿A qué se debe este fenómeno? 
+
+  > **Spoiler**: El error de interpolación de Lagrange puede tender a infinito cuando $n\to\infty$ pero, para interpolación a trozos, el error tiende a cero.
+
+

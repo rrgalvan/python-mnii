@@ -1,0 +1,142 @@
+---
+title: "Práctica 2" 
+author: "J. Rafael Rguez. Galván"
+format: 
+  pdf
+---
+
+# Markdown
+
+Lenguaje de marcado, mucho más sencillo que \LaTeX, disponible en celdas de Jupyter (y en muchos otro sitios: Github, ChatGPT,...). Introducción sencilla de **negritas**, *italicas*, secciones, listas, hiperenlaces... Uso de \$ ... \$ para incluir expresiones \LaTeX. 
+
+# Bibliotecas matemáticas y científicas en Python
+
+1. Cálculo numérico: numpy + matplotlib + scipy 
+
+  * [Numpy](https://nbviewer.org/github/rrgalvan/numerical_python_course/blob/master/10-Numpy.ipynb): vectores y matrices
+  * [Matplotlib](https://nbviewer.org/github/rrgalvan/clases-python-cientifico/blob/master/Lecture-4-Matplotlib.ipynb): gráficos 2D y 3D
+  * [Scipy](https://nbviewer.org/github/rrgalvan/numerical_python_course/blob/master/12-Scipy.ipynb): bilioteca científica, implementación de métodos numéricos, etc.
+
+2. Otros
+
+* [Sympy](https://nbviewer.org/github/rrgalvan/clases-python-cientifico/blob/master/Lecture-5-Sympy.ipynb): Cálculo símbólico
+* [Pandas](https://pandas.pydata.org/): Análisis y manipulación de datos 
+
+
+# Uso de módulos en Python: *Numpy*
+
+## Carga de objetos de *Numpy*: $\pi^2$.
+
+```{python}
+import numpy as np
+np.pi**2
+```
+
+Alternativa: 
+```{python}
+from numpy import pi
+pi**2
+```
+Versión simbólica de $\pi$
+```{python}
+from sympy import pi
+pi**2
+```
+
+Se puede importar todo el contenido de un paquete de la siguiente forma
+```{python}
+from numpy import *
+pi**2
+```
+
+- Pregunta: ¿qué diferencia hay entre `import numpy` y `from numpy import *`?
+
+- Importar todo el contenido de los paquete es (`from numpy import *`) es **desaconsejable** en general, pues puede dar lugar a ambigüedades. ¿Por qué? 
+
+  Si cargamos primero todo el contenido de numpy y luego todo el de simpy, se puede comprobar que el objeto $\pi$ cambia (pasará de ser una variable en doble precisión a una variable simbólica). ¿Ocurre lo mismo con el número $e$?. Indicación: el número $e$ se puede encontrar como `numpy.e` o `simpy.E`. 
+
+
+Cada paquete tiene su propio conjunto de funciones matemáticas, de distinta naturaleza. Pueden usarse conjuntamente:
+```{python}
+import numpy as np
+cos_pi_numer = np.cos(np.pi)
+print("Numpy:", cos_pi_numer, type(cos_pi_numer))
+
+import sympy as sy
+cos_pi_simbolic = sy.cos(sy.pi)
+print("Sympy:", cos_pi_simbolic, type(cos_pi_simbolic))
+```
+
+## Creación de *arrays* (vectores, matrices, *tensores*)
+
+```{python}
+v = np.array([1,2,3])  # Vector
+v
+```
+
+```{python}
+A = np.array([[1,2,3], [4,5,6]])  # Matriz
+A
+```
+
+```{python}
+A.shape  # Tamaño de la matriz
+```
+
+```{python}
+A.dtype  # Tipo de los elementos de la matriz
+```
+
+```{python}
+len(A)  # Número de filas de la matriz
+```
+
+```{python}
+A[0]  # Primera fila
+```
+
+```{python}
+A[0,1]  # Elemento en la primera fila, segunda columna ($A_{1,2}$)
+```
+
+```{python}
+A[:,1]  # Segunda columna
+```
+
+```{python}
+A.dot(-2*v)  # Producto matricial
+```
+
+```{python}
+3 * np.ones( (2,5) )  # 3*(matriz 2x5 llena de unos)
+```
+
+```{python}
+np.zeros(5)  # vector con 5 ceros
+```
+
+
+```{python}
+np.linspace(0, 1, 5)  # 5 puntos equiespaciados en $[0,1]$
+```
+
+```{python}
+np.arange(0, 5)  # vector de enteros en $[0,5)$
+```
+
+# Gráficas con Matplotlib
+
+## [Ver enlace](https://nbviewer.org/github/rrgalvan/clases-python-cientifico/blob/master/Lecture-4-Matplotlib.ipynb)
+
+## Ejercicio 1. 
+
+1. Dibujar la gráfica de la función $\sin(x)$ en $[-\pi,\pi]$, en primer lugar mediante la interfaz *de tipo Matlab* y en segundo lugar mediante la interfaz *orientada a Objetos* (ver el enlace anterior).
+
+2. Adaptar esta última gráfica, añadiéndole la función $\cos(x)$, modificando las características de línea (color, marcadores...). Añadirle un título y una leyenda.
+
+## Ejercicio 2.
+
+1. Representar gráficamente con `Matplotlib` la función $f(x) = x^2 e^x -1$ en distintos intervalos: $[a,b]=[-10,10]$, $[a,b]=[-2,2]$. Dibujar en negro las líneas correspondientes a los ejes $OX$ y $OY$ (`axhline`, `axvline`). Comprobar gráficamente que $f$ tiene un único cero, situado en $[0,1]$. 
+
+
+2. Comprobar que se verifican las hipótesis del Teorema de Bolzano en $[0,1]$. Comprobar que el cero de $f$ en $[0,1]$ es un punto fijo de $g(x)=e^{-x/2}$. Usar la función `punto_fijo` para aproximar el cero de $f$.
